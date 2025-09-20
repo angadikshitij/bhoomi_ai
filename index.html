@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+    <style>
+      :root {
+        --chat-bg: #D6F6D8; /* chatbot background */
+        --reply-bg: #7AC27E; /* assistant reply bubble */
+        --user-bg: #004830; /* user message bubble */
+        --select-bg: #Ffde59; /* text selection */
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.15); /* default UI shadow */
+        --bubble-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); /* stronger bubble shadow */
+      }
+
+      /* Global resets */
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: #f7f8f9;
+        color: #0b2416;
+      }
+
+      ::selection { background: var(--select-bg); }
+
+      .page-wrap {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      /* Gentle floating animations for message bubbles */
+      @keyframes floatUser {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+        100% { transform: translateY(0); }
+      }
+      @keyframes floatBot {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+        100% { transform: translateY(0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .msg { animation: none !important; }
+      }
+
+      /* Chatbot container */
+      .chatbot {
+        width: min(900px, 100%);
+        height: min(80vh, 720px);
+        background: var(--chat-bg);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.06);
+      }
+
+      .chatbot__header {
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(2px);
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+      }
+      .chatbot__title {
+        font-weight: 700;
+        font-size: 18px;
+        color: #0b2416;
+      }
+      .chatbot__subtitle { color: #2c6e49; font-size: 12px; }
+
+      .chatbot__messages {
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .msg {
+        max-width: 78%;
+        padding: 12px 14px;
+        border-radius: 14px;
+        line-height: 1.35;
+        box-shadow: var(--bubble-shadow);
+        will-change: transform;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+      }
+      .msg--user {
+        align-self: flex-end;
+        background: var(--user-bg);
+        color: #ffffff;
+        border-top-right-radius: 6px;
+        animation: floatUser 4.8s ease-in-out infinite;
+      }
+      .msg--bot {
+        align-self: flex-start;
+        background: var(--reply-bg);
+        color: #0b2416;
+        border-top-left-radius: 6px;
+        animation: floatBot 4.8s ease-in-out infinite;
+      }
+
+      .chatbot__input {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        padding: 14px;
+        background: rgba(255,255,255,0.6);
+        border-top: 1px solid rgba(0,0,0,0.06);
+      }
+      .chatbot__textarea {
+        resize: none;
+        min-height: 44px;
+        max-height: 120px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.15);
+        outline: none;
+        font-size: 14px;
+      }
+      .chatbot__textarea:focus {
+        border-color: #2c6e49;
+        box-shadow: 0 0 0 4px rgba(44, 110, 73, 0.12);
+      }
+      .chatbot__send {
+        padding: 0 18px;
+        border: none;
+        border-radius: 12px;
+        background: #2c6e49;
+        color: #ffffff;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+      }
+      .chatbot__send:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!-- Chatbot UI -->
+    <div class="page-wrap">
+      <section class="chatbot" role="region" aria-label="Chatbot">
+        <header class="chatbot__header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#2c6e49" aria-hidden="true"><path d="M12 3C7.03 3 3 6.58 3 11c0 2.21 1.05 4.2 2.76 5.64-.11.85-.49 2.17-1.6 3.41 0 0 2.04-.14 3.74-1.34.73.2 1.51.29 2.32.29 4.97 0 9-3.58 9-8s-4.03-8-9-8z"/></svg>
+          <div>
+            <div class="chatbot__title">Bhoomi AI Chat</div>
+            <div class="chatbot__subtitle">Ask anything about crops, soil and fertilizer</div>
+          </div>
+        </header>
+        <div id="messages" class="chatbot__messages" aria-live="polite" aria-relevant="additions"></div>
+        <form id="chat-form" class="chatbot__input" autocomplete="off">
+          <textarea id="chat-input" class="chatbot__textarea" placeholder="Type your message..." rows="1"></textarea>
+          <button id="send-btn" class="chatbot__send" type="submit">Send</button>
+        </form>
+      </section>
+    </div>
+    <!-- Load components -->
+    <script src="components/FertilizerPane.js"></script>
+    <!-- Load main script -->
+    <script src="js/main.js"></script>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>
